@@ -4,6 +4,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Phone, Mail, MapPin } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+// Si vols fer servir axios, hauries d'importar-lo:
+// import axios from 'axios';
 
 const ContactForm = () => {
   const { toast } = useToast();
@@ -13,7 +15,7 @@ const ContactForm = () => {
     phone: '',
     subject: '',
     message: '',
-    'bot-field': '', // Necessari per gestionar el honeypot de Netlify
+    // 'bot-field': '', // Opcional si el vols gestionar a l'estat
   });
   
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,39 +37,31 @@ const ContactForm = () => {
   }
 
   const handleSubmit = (e: React.FormEvent) => {
-    // Prevenció del comportament per defecte
+    // 3. Prevenció del comportament per defecte
     e.preventDefault(); 
     setIsSubmitting(true);
 
     const formName = "contact-form-netlify"; 
     
-    // Control total sobre l'estructura de les dades enviades
+    // 2. Control total sobre l'estructura de les dades enviades
     const netlifyPayload = {
       "form-name": formName,
       ...formData,
     };
 
-    // Ús d'un client HTTP (Fetch en aquest cas)
+    // 5. Ús d'un client HTTP (Fetch en aquest cas)
     fetch("/", { 
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: encode(netlifyPayload) // Utilitzem les dades codificades
     })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`Network response was not ok: ${response.statusText}`);
-      }
+    .then(() => {
       toast({
         title: "Formulari enviat correctament",
         description: "Ens posarem en contacte amb vostè tan aviat com sigui possible.",
       });
       setFormData({
-        name: '', 
-        email: '', 
-        phone: '', 
-        subject: '', 
-        message: '',
-        'bot-field': '', // Resetegem també el camp honeypot
+        name: '', email: '', phone: '', subject: '', message: '',
       });
     })
     .catch((error) => {
@@ -136,7 +130,7 @@ const ContactForm = () => {
                 <input type="hidden" name="form-name" value="contact-form-netlify" />
                 <p className="hidden" style={{ display: 'none' }}> 
                   <label>
-                    No omplir si ets humà: <input name="bot-field" value={formData['bot-field']} onChange={handleChange} />
+                    No omplir si ets humà: <input name="bot-field" onChange={handleChange} />
                   </label>
                 </p>
 
